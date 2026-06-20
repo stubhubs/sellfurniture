@@ -1,648 +1,601 @@
 
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell Furniture | Buy & Sell Premium Furniture</title>
+    <title>Sell Old Furniture - Easy Marketplace & Live Bargain Chat</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts for Editorial Elegance -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght=400;600;700&family=Inter:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Babel for JSX Compilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdfbf7',
+                            100: '#f6ebd9',
+                            200: '#eedab7',
+                            500: '#d97706', // Amber-600
+                            600: '#b45309', // Amber-700
+                            800: '#92400e', // Amber-800
+                            900: '#78350f', // Amber-900
+                        }
+                    },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#fcf9f5',
-                            100: '#f5eee3',
-                            500: '#b88e2f',
-                            600: '#a37c26',
-                            900: '#3a3a3a',
-                        }
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Custom scrollbar for a premium feel */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #b88e2f; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a37c26; }
-        
-        /* Hide scrollbar for category list but keep functionality */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .toast-enter { transform: translateY(100%); opacity: 0; }
-        .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 300ms ease-out; }
-        .toast-exit { transform: translateY(0); opacity: 1; }
-        .toast-exit-active { transform: translateY(100%); opacity: 0; transition: all 300ms ease-in; }
+        /* Custom Premium Scrollbar for Chat Window */
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: #b45309; 
+            border-radius: 10px;
+        }
+        body {
+            background-color: #fdfbf7;
+        }
     </style>
 </head>
-<body class="bg-brand-50 text-gray-800 font-sans antialiased overflow-x-hidden">
+<body class="selection:bg-brand-100 selection:text-brand-900">
+    <div id="root"></div>
 
-    <nav class="bg-white shadow-sm fixed w-full z-50 top-0 transition-all duration-300" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <span class="font-serif text-2xl font-bold text-brand-900 tracking-tight">Sell<span class="text-brand-500">Furniture</span></span>
-                </div>
-                
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex space-x-8 items-center">
-                    <a href="#home" class="text-gray-600 hover:text-brand-500 font-medium transition-colors">Home</a>
-                    <a href="#shop" class="text-gray-600 hover:text-brand-500 font-medium transition-colors">Shop</a>
-                    <a href="#sell" class="text-gray-600 hover:text-brand-500 font-medium transition-colors">Sell</a>
-                    <a href="#about" class="text-gray-600 hover:text-brand-500 font-medium transition-colors">About</a>
-                </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-                <!-- Icons -->
-                <div class="flex items-center space-x-5">
-                    <button class="text-gray-600 hover:text-brand-500 transition-colors">
-                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
-                    </button>
-                    <button class="text-gray-600 hover:text-brand-500 transition-colors">
-                        <i class="fa-regular fa-user text-lg"></i>
-                    </button>
-                    <button class="text-gray-600 hover:text-brand-500 transition-colors relative" onclick="toggleCart()">
-                        <i class="fa-solid fa-cart-shopping text-lg"></i>
-                        <span id="cart-count" class="absolute -top-2 -right-2 bg-brand-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
-                    </button>
-                    <!-- Mobile menu button -->
-                    <button class="md:hidden text-gray-600 hover:text-brand-500 focus:outline-none" onclick="toggleMobileMenu()">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full">
-            <div class="px-4 pt-2 pb-6 space-y-2 shadow-lg">
-                <a href="#home" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500 hover:bg-brand-50 rounded-md">Home</a>
-                <a href="#shop" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500 hover:bg-brand-50 rounded-md">Shop</a>
-                <a href="#sell" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500 hover:bg-brand-50 rounded-md">Sell</a>
-                <a href="#about" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-brand-500 hover:bg-brand-50 rounded-md">About</a>
-            </div>
-        </div>
-    </nav>
-
-    <section id="home" class="pt-20 relative bg-brand-100">
-        <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1618220179428-22790b46a0eb?q=80&w=2070&auto=format&fit=crop" alt="Modern living room" class="w-full h-[600px] object-cover opacity-80 mix-blend-multiply">
-        </div>
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[600px] flex items-center">
-            <div class="bg-white/90 backdrop-blur-sm p-8 md:p-12 rounded-xl shadow-2xl max-w-lg">
-                <p class="text-brand-500 font-semibold tracking-wider uppercase text-sm mb-2">New Arrival & Pre-loved</p>
-                <h1 class="text-4xl md:text-5xl font-serif font-bold text-brand-900 leading-tight mb-4">
-                    Discover Quality Furniture.
-                </h1>
-                <p class="text-gray-600 mb-8 text-lg">
-                    Buy stunning pieces for your home, or turn your pre-loved furniture into cash instantly.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                    <a href="#shop" class="bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 px-8 rounded-md transition-colors text-center shadow-md">
-                        Buy Now
-                    </a>
-                    <a href="#sell" class="bg-transparent border-2 border-brand-900 text-brand-900 hover:bg-brand-900 hover:text-white font-medium py-3 px-8 rounded-md transition-colors text-center">
-                        Sell Yours
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-serif font-bold text-brand-900">Browse The Range</h2>
-                <p class="text-gray-500 mt-2">Find exactly what you need for every room.</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Category 1 -->
-                <div class="group cursor-pointer">
-                    <div class="overflow-hidden rounded-lg shadow-md mb-4 h-80">
-                        <img src="https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=1470&auto=format&fit=crop" alt="Living Room" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    </div>
-                    <h3 class="text-xl font-semibold text-center text-gray-800">Living Room</h3>
-                </div>
-                <!-- Category 2 -->
-                <div class="group cursor-pointer">
-                    <div class="overflow-hidden rounded-lg shadow-md mb-4 h-80">
-                        <img src="https://images.unsplash.com/photo-1505693314120-0d443867891c?q=80&w=1511&auto=format&fit=crop" alt="Bedroom" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    </div>
-                    <h3 class="text-xl font-semibold text-center text-gray-800">Bedroom</h3>
-                </div>
-                <!-- Category 3 -->
-                <div class="group cursor-pointer">
-                    <div class="overflow-hidden rounded-lg shadow-md mb-4 h-80">
-                        <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1632&auto=format&fit=crop" alt="Dining" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    </div>
-                    <h3 class="text-xl font-semibold text-center text-gray-800">Dining</h3>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="shop" class="py-16 bg-brand-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-end mb-10">
-                <div>
-                    <h2 class="text-3xl font-serif font-bold text-brand-900">Featured Products</h2>
-                    <p class="text-gray-500 mt-2">Handpicked premium items just for you.</p>
-                </div>
-                <button class="hidden md:block text-brand-500 hover:text-brand-600 font-medium border-b-2 border-brand-500 pb-1">View All</button>
-            </div>
-
-            <!-- Product Grid Container -->
-            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Products will be injected here by JavaScript -->
-            </div>
-            
-            <div class="mt-10 text-center md:hidden">
-                <button class="bg-white border border-gray-300 text-gray-800 font-medium py-3 px-8 rounded-md hover:bg-gray-50 w-full shadow-sm">View All Products</button>
-            </div>
-        </div>
-    </section>
-
-    <section id="sell" class="py-20 bg-white relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="bg-brand-900 rounded-2xl shadow-xl overflow-hidden flex flex-col lg:flex-row">
-                
-                <!-- Left Info Side -->
-                <div class="lg:w-1/2 p-10 md:p-16 text-white flex flex-col justify-center relative">
-                    <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                    <h2 class="text-3xl md:text-4xl font-serif font-bold mb-6 relative z-10">Time for a change? Sell your furniture.</h2>
-                    <p class="text-gray-300 mb-8 relative z-10">We make it incredibly simple to list your pre-loved furniture. Reach thousands of buyers and get paid quickly and securely.</p>
-                    <ul class="space-y-4 relative z-10">
-                        <li class="flex items-start">
-                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center mt-1">
-                                <i class="fa-solid fa-check text-xs text-white"></i>
-                            </div>
-                            <p class="ml-3 text-gray-200">List items in under 2 minutes</p>
-                        </li>
-                        <li class="flex items-start">
-                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center mt-1">
-                                <i class="fa-solid fa-check text-xs text-white"></i>
-                            </div>
-                            <p class="ml-3 text-gray-200">Secure payment protection</p>
-                        </li>
-                        <li class="flex items-start">
-                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center mt-1">
-                                <i class="fa-solid fa-check text-xs text-white"></i>
-                            </div>
-                            <p class="ml-3 text-gray-200">Local pickup & delivery coordination</p>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Right Form Side -->
-                <div class="lg:w-1/2 bg-white p-10 md:p-16">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Quick Listing Form</h3>
-                    <form id="sell-form" onsubmit="handleSellSubmit(event)">
-                        <div class="space-y-5">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Item Title</label>
-                                <input type="text" required placeholder="e.g. Vintage Leather Sofa" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-shadow">
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                    <select class="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white">
-                                        <option>Seating</option>
-                                        <option>Tables</option>
-                                        <option>Beds</option>
-                                        <option>Storage</option>
-                                        <option>Decor</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
-                                    <input type="number" required placeholder="0.00" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Upload Photos</label>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-brand-500 transition-colors cursor-pointer" onclick="document.getElementById('file-upload').click()">
-                                    <div class="space-y-1 text-center">
-                                        <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400"></i>
-                                        <div class="flex text-sm text-gray-600 justify-center">
-                                            <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-brand-500 hover:text-brand-600">
-                                                <span>Upload files</span>
-                                                <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple>
-                                            </label>
-                                            <p class="pl-1">or drag and drop</p>
-                                        </div>
-                                        <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-medium py-3 px-4 rounded-md shadow-md transition-colors flex justify-center items-center gap-2">
-                                <i class="fa-solid fa-tag"></i> List Item for Sale
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer id="about" class="bg-white border-t border-gray-200 pt-16 pb-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                <div class="col-span-1 md:col-span-1">
-                    <span class="font-serif text-2xl font-bold text-brand-900 tracking-tight">Sell<span class="text-brand-500">Furniture</span></span>
-                    <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                        The premier destination to buy high-quality furniture and easily sell your pre-loved pieces to a trusted community.
-                    </p>
-                    <div class="flex space-x-4 mt-6">
-                        <a href="#" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-brand-500 hover:text-white transition-colors"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="#" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-brand-500 hover:text-white transition-colors"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-brand-500 hover:text-white transition-colors"><i class="fa-brands fa-twitter"></i></a>
-                    </div>
-                </div>
-                
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-4">Quick Links</h4>
-                    <ul class="space-y-3 text-sm text-gray-500">
-                        <li><a href="#home" class="hover:text-brand-500 transition-colors">Home</a></li>
-                        <li><a href="#shop" class="hover:text-brand-500 transition-colors">Shop Furniture</a></li>
-                        <li><a href="#sell" class="hover:text-brand-500 transition-colors">Sell Furniture</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">About Us</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-4">Support</h4>
-                    <ul class="space-y-3 text-sm text-gray-500">
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Help & FAQ</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Shipping Policy</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Returns</a></li>
-                        <li><a href="#" class="hover:text-brand-500 transition-colors">Contact Us</a></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-gray-900 mb-4">Newsletter</h4>
-                    <p class="text-sm text-gray-500 mb-4">Subscribe for the latest listings and exclusive offers.</p>
-                    <div class="flex">
-                        <input type="email" placeholder="Your email address" class="px-4 py-2 w-full rounded-l-md border border-gray-300 focus:outline-none focus:border-brand-500 text-sm">
-                        <button class="bg-brand-900 hover:bg-black text-white px-4 py-2 rounded-r-md text-sm font-medium transition-colors">SUBSCRIBE</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                <p>&copy; 2026 SellFurniture. All rights reserved.</p>
-                <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#" class="hover:text-gray-900">Privacy Policy</a>
-                    <a href="#" class="hover:text-gray-900">Terms of Service</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <div id="cart-overlay" class="fixed inset-0 bg-black/50 z-[60] hidden transition-opacity opacity-0 backdrop-blur-sm" onclick="toggleCart()"></div>
-    <div id="cart-panel" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[70] transform translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col">
-        <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-brand-50">
-            <h2 class="text-xl font-serif font-bold text-gray-900">Shopping Cart</h2>
-            <button onclick="toggleCart()" class="text-gray-400 hover:text-gray-800 transition-colors">
-                <i class="fa-solid fa-xmark text-2xl"></i>
-            </button>
-        </div>
-        <div id="cart-items" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-            <!-- Cart items injected via JS -->
-            <div class="flex-1 flex flex-col items-center justify-center text-gray-400" id="empty-cart-msg">
-                <i class="fa-solid fa-cart-arrow-down text-5xl mb-4 opacity-50"></i>
-                <p>Your cart is empty.</p>
-                <button onclick="toggleCart(); window.location.href='#shop'" class="mt-4 text-brand-500 font-medium hover:underline">Continue Shopping</button>
-            </div>
-        </div>
-        <div class="p-6 border-t border-gray-100 bg-white">
-            <div class="flex justify-between items-center mb-6">
-                <span class="font-medium text-gray-600">Subtotal</span>
-                <span class="font-bold text-xl text-gray-900" id="cart-total">$0.00</span>
-            </div>
-            <button class="w-full bg-brand-900 hover:bg-black text-white py-4 rounded-md font-medium shadow-md transition-colors" onclick="checkout()">
-                Proceed to Checkout
-            </button>
-        </div>
-    </div>
-
-    <div id="toast-container" class="fixed bottom-5 right-5 z-[100] flex flex-col gap-3 pointer-events-none"></div>
-
-    <script>
-        // Mock Product Data
-        const products = [
+        const initialListings = [
             {
                 id: 1,
-                name: "Minimalist Lounge Chair",
-                category: "Seating",
-                price: 299.99,
-                image: "https://images.unsplash.com/photo-1592078615290-033ee584e267?q=80&w=1000&auto=format&fit=crop",
-                tag: "New",
-                isPreloved: false
+                title: "Mid-Century Modern Lounge Chair",
+                price: 250,
+                condition: "Excellent",
+                description: "Beautiful teak wood frame with original olive green upholstery. Minor wear consistent with age.",
+                image: "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?auto=format&fit=crop&w=800&q=80",
+                seller: "Sarah M."
             },
             {
                 id: 2,
-                name: "Pre-loved Velvet Sofa",
-                category: "Living Room",
-                price: 450.00,
-                originalPrice: 899.00,
-                image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop",
-                tag: "-50%",
-                isPreloved: true
+                title: "Rustic Farmhouse Dining Table",
+                price: 400,
+                condition: "Good",
+                description: "Solid oak wood, seats 6 comfortably. Has a lovely distressed finish.",
+                image: "https://images.unsplash.com/photo-1533090481720-856c2e3e158f?auto=format&fit=crop&w=800&q=80",
+                seller: "John D."
             },
             {
                 id: 3,
-                name: "Solid Oak Dining Table",
-                category: "Tables",
-                price: 549.00,
-                image: "https://images.unsplash.com/photo-1530018607912-eff2daa1bac4?q=80&w=1000&auto=format&fit=crop",
-                tag: null,
-                isPreloved: false
+                title: "Vintage Velvet Sofa",
+                price: 650,
+                condition: "Like New",
+                description: "Restored 1970s velvet sofa in mustard yellow. Extremely comfortable and a great statement piece.",
+                image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80",
+                seller: "Emily R."
             },
             {
                 id: 4,
-                name: "Vintage Side Table",
-                category: "Tables",
-                price: 85.00,
-                image: "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?q=80&w=1000&auto=format&fit=crop",
-                tag: "Rare",
-                isPreloved: true
-            },
-            {
-                id: 5,
-                name: "Modern Bed Frame",
-                category: "Bedroom",
-                price: 620.00,
-                image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1000&auto=format&fit=crop",
-                tag: null,
-                isPreloved: false
-            },
-            {
-                id: 6,
-                name: "Boho Rattan Chair",
-                category: "Seating",
-                price: 180.00,
-                image: "https://images.unsplash.com/photo-1519947486511-46149fa0a254?q=80&w=1000&auto=format&fit=crop",
-                tag: null,
-                isPreloved: true
-            },
-            {
-                id: 7,
-                name: "Industrial Bookshelf",
-                category: "Storage",
-                price: 240.00,
-                image: "https://images.unsplash.com/photo-1594620302200-9a762244a156?q=80&w=1000&auto=format&fit=crop",
-                tag: "Popular",
-                isPreloved: false
-            },
-            {
-                id: 8,
-                name: "Ceramic Table Lamp",
-                category: "Decor",
-                price: 65.00,
-                image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=80&w=1000&auto=format&fit=crop",
-                tag: null,
-                isPreloved: false
+                title: "Antique Mahogany Bookshelf",
+                price: 150,
+                condition: "Fair",
+                description: "Tall mahogany bookshelf. Needs a bit of polishing but structurally very sound.",
+                image: "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&w=800&q=80",
+                seller: "Mike T."
             }
         ];
 
-        let cart = [];
+        // Chat Widget Component
+        const ChatWidget = ({ isOpen, setIsOpen, activeItem, chatMode, setChatMode }) => {
+            const [messages, setMessages] = useState([]);
+            const [inputValue, setInputValue] = useState('');
+            const [isTyping, setIsTyping] = useState(false);
+            const chatEndRef = useRef(null);
 
-        // Render Products
-        function renderProducts() {
-            const grid = document.getElementById('product-grid');
-            grid.innerHTML = '';
+            // Auto-scroll chat to bottom
+            useEffect(() => {
+                if (chatEndRef.current) {
+                    chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, [messages, isOpen, isTyping]);
 
-            products.forEach(product => {
-                const prelovedBadge = product.isPreloved ? 
-                    `<div class="absolute top-4 left-4 bg-gray-900 text-white text-xs font-bold px-2 py-1 rounded shadow">Pre-loved</div>` : '';
+            // React dynamically to Mode changes (Buy or Sell) or selected item
+            useEffect(() => {
+                if (!isOpen) return;
+
+                if (chatMode === 'sell') {
+                    setMessages([
+                        { 
+                            sender: 'agent', 
+                            text: "Hello! Ready to sell your furniture? Let me know what you are listing (e.g. sofa, chair, table) and your desired price, or select a quick option below!" 
+                        }
+                    ]);
+                } else if (chatMode === 'buy' && activeItem) {
+                    setMessages([
+                        { 
+                            sender: 'agent', 
+                            text: `Hi there! I'm here to help you get the best deal on the "${activeItem.title}". The current asking price is $${activeItem.price}. What offer do you have in mind?` 
+                        }
+                    ]);
+                } else {
+                    setMessages([
+                        { 
+                            sender: 'agent', 
+                            text: "Hello! Welcome to Sell Old Furniture. I can help you purchase vintage items, bargain prices, or instantly list your own furniture. How can I assist you?" 
+                        }
+                    ]);
+                }
+            }, [activeItem, isOpen, chatMode]);
+
+            // Clever response logic to handle bargaining & listings instantly
+            const processInstantReply = (userInputText) => {
+                setIsTyping(true);
                 
-                const discountBadge = product.tag ? 
-                    `<div class="absolute top-4 right-4 bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">${product.tag}</div>` : '';
+                setTimeout(() => {
+                    setIsTyping(false);
+                    const cleanText = userInputText.toLowerCase();
+                    let reply = "";
 
-                const originalPrice = product.originalPrice ? 
-                    `<span class="text-gray-400 line-through text-sm ml-2">$${product.originalPrice.toFixed(2)}</span>` : '';
+                    if (chatMode === 'sell') {
+                        if (cleanText.includes("sofa") || cleanText.includes("couch") || cleanText.includes("chair") || cleanText.includes("table") || cleanText.includes("cabinet") || cleanText.includes("list")) {
+                            reply = `Excellent! To finalize listing your item, set up images, and get it published directly on our homepage, please dial our specialist line: +1(805) 262-8248. We're ready to list it for you right now!`;
+                        } else if (cleanText.match(/\d+/g)) {
+                            reply = `Perfect! Price noted. Let's make this live. Give us a quick ring at +1(805) 262-8248 so we can verify details and list your furniture immediately!`;
+                        } else {
+                            reply = `Wonderful! To secure your listing and speak to a direct representative, please call us at +1(805) 262-8248. We are available to help you upload and post today!`;
+                        }
+                    } else {
+                        const itemPrice = activeItem ? activeItem.price : 200;
+                        const itemName = activeItem ? activeItem.title : "this piece";
+                        const numbersInText = cleanText.match(/\d+/g);
+                        const numericOffer = numbersInText ? parseInt(numbersInText[0]) : null;
 
-                const cardHTML = `
-                    <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col h-full border border-gray-100">
-                        <div class="relative h-64 overflow-hidden bg-gray-100">
-                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                            ${prelovedBadge}
-                            ${discountBadge}
-                            
-                            <!-- Overlay Actions -->
-                            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                                <button onclick="addToCart(${product.id})" class="bg-white text-brand-900 hover:bg-brand-500 hover:text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300">
-                                    <i class="fa-solid fa-cart-plus"></i>
-                                </button>
-                                <button onclick="showToast('Added to favorites', 'success')" class="bg-white text-brand-900 hover:bg-red-500 hover:text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300 delay-75">
-                                    <i class="fa-regular fa-heart"></i>
-                                </button>
+                        if (cleanText.includes("available")) {
+                            reply = `Yes! The ${itemName} is still available and ready for immediate local pick-up. Would you like to make an offer?`;
+                        } else if (cleanText.includes("deliver") || cleanText.includes("shipping")) {
+                            reply = "We offer convenient warehouse pick-up and local delivery assistance. Call us directly at +1(805) 262-8248 to confirm local shipping rates!";
+                        } else if (numericOffer) {
+                            const minAcceptablePrice = itemPrice * 0.8; // 20% max discount rule
+
+                            if (numericOffer >= itemPrice) {
+                                reply = `Terrific! We accept $${numericOffer} for the "${itemName}". Let's finalize your purchase! Call us immediately at +1(805) 262-8248 to schedule pickup.`;
+                            } else if (numericOffer >= minAcceptablePrice) {
+                                reply = `That is a fair offer! We can agree on $${numericOffer} for "${itemName}". Please call +1(805) 262-8248 to secure your purchase and organize pickup!`;
+                            } else {
+                                const counterPrice = Math.round(itemPrice * 0.9);
+                                reply = `A bit too low for a genuine vintage piece! The absolute best we can do is split the difference at $${counterPrice}. Call +1(805) 262-8248 to lock in this special rate!`;
+                            }
+                        } else {
+                            reply = `Got it! To ask more details, finalize buying, or arrange delivery for the "${itemName}", feel free to call us at +1(805) 262-8248! We are always ready to assist.`;
+                        }
+                    }
+
+                    setMessages(prev => [...prev, { sender: 'agent', text: reply }]);
+                }, 800);
+            };
+
+            const handleSend = (e) => {
+                e.preventDefault();
+                if (!inputValue.trim()) return;
+
+                const userMsg = inputValue;
+                setMessages(prev => [...prev, { sender: 'user', text: userMsg }]);
+                setInputValue('');
+                processInstantReply(userMsg);
+            };
+
+            const handleQuickAction = (actionText) => {
+                setMessages(prev => [...prev, { sender: 'user', text: actionText }]);
+                processInstantReply(actionText);
+            };
+
+            if (!isOpen) {
+                return (
+                    <button 
+                        onClick={() => {
+                            setChatMode('buy');
+                            setIsOpen(true);
+                        }}
+                        className="fixed bottom-6 right-6 bg-brand-600 text-white py-4 px-6 rounded-full shadow-2xl hover:bg-brand-500 transition-all z-50 flex items-center justify-center gap-2 transform hover:scale-105"
+                    >
+                        <i className="fa-solid fa-comments text-xl"></i>
+                        <span className="text-sm font-bold">Negotiate or List Furniture</span>
+                    </button>
+                );
+            }
+
+            return (
+                <div className="fixed bottom-6 right-6 w-92 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col border border-stone-200" style={{ height: '520px' }}>
+                    
+                    {/* Header */}
+                    <div className="bg-brand-900 text-white p-4 flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center font-bold text-white">
+                                <i className="fa-solid fa-user-tie text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-sm">Live Agent Assistant</h3>
+                                <p className="text-[11px] text-brand-100 font-medium">
+                                    {chatMode === 'sell' ? "Listing Assistant Active" : "Buyer Price Bargain Active"}
+                                </p>
                             </div>
                         </div>
-                        <div class="p-5 flex-1 flex flex-col">
-                            <p class="text-gray-400 text-xs mb-1 uppercase tracking-wider">${product.category}</p>
-                            <h3 class="text-lg font-semibold text-gray-800 mb-2 leading-tight flex-1">${product.name}</h3>
-                            <div class="flex items-center justify-between mt-auto">
-                                <div class="font-bold text-lg text-brand-900">
-                                    $${product.price.toFixed(2)} ${originalPrice}
+                        <div className="flex items-center gap-2">
+                            {/* Toggle chat context */}
+                            <button 
+                                onClick={() => setChatMode(chatMode === 'buy' ? 'sell' : 'buy')}
+                                className="text-[11px] bg-brand-600 hover:bg-brand-500 text-white px-2.5 py-1 rounded font-semibold transition-all mr-2"
+                            >
+                                {chatMode === 'buy' ? "Switch to Sell" : "Switch to Buy"}
+                            </button>
+                            <button onClick={() => setIsOpen(false)} className="text-stone-300 hover:text-white transition-colors">
+                                <i className="fa-solid fa-xmark text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Messages Area */}
+                    <div className="flex-1 p-4 overflow-y-auto bg-stone-50 chat-scroll flex flex-col gap-3">
+                        {messages.map((msg, idx) => (
+                            <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-[85%] rounded-2xl p-3 text-sm ${
+                                    msg.sender === 'user' 
+                                    ? 'bg-brand-600 text-white rounded-br-none shadow-sm' 
+                                    : 'bg-white border border-stone-200 text-stone-800 rounded-bl-none shadow-sm'
+                                }`}>
+                                    {msg.text}
+                                </div>
+                            </div>
+                        ))}
+                        {isTyping && (
+                            <div className="flex justify-start">
+                                <div className="bg-white border border-stone-200 text-stone-500 rounded-2xl p-3 text-sm shadow-sm flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce"></span>
+                                    <span className="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                                    <span className="w-1.5 h-1.5 bg-brand-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                                </div>
+                            </div>
+                        )}
+                        <div ref={chatEndRef} />
+                    </div>
+
+                    {/* Quick Helper Actions */}
+                    {chatMode === 'sell' ? (
+                        <div className="bg-stone-100 px-3 py-2 border-t border-stone-200 flex flex-wrap gap-1.5 items-center">
+                            <span className="text-[10px] uppercase font-bold text-stone-500">I want to list:</span>
+                            <button 
+                                onClick={() => handleQuickAction("🛋️ I want to list a Couch / Sofa")}
+                                className="text-xs bg-white border border-stone-300 hover:border-brand-500 text-stone-700 px-2 py-1 rounded-md transition-all shadow-sm"
+                            >
+                                Couch
+                            </button>
+                            <button 
+                                onClick={() => handleQuickAction("🪑 I want to list a Vintage Chair")}
+                                className="text-xs bg-white border border-stone-300 hover:border-brand-500 text-stone-700 px-2 py-1 rounded-md transition-all shadow-sm"
+                            >
+                                Chair
+                            </button>
+                            <button 
+                                onClick={() => handleQuickAction("🪵 I want to list a Table or Cabinet")}
+                                className="text-xs bg-white border border-stone-300 hover:border-brand-500 text-stone-700 px-2 py-1 rounded-md transition-all shadow-sm"
+                            >
+                                Table/Cabinet
+                            </button>
+                        </div>
+                    ) : (
+                        activeItem && (
+                            <div className="bg-stone-100 px-3 py-2 border-t border-stone-200 flex flex-wrap gap-1.5 items-center">
+                                <span className="text-[10px] uppercase font-bold text-stone-500">Quick Offer:</span>
+                                <button 
+                                    onClick={() => handleQuickAction(`Is the "${activeItem.title}" still available?`)}
+                                    className="text-xs bg-white border border-stone-300 hover:border-brand-500 text-stone-700 px-2 py-1 rounded-md transition-all shadow-sm"
+                                >
+                                    Availability?
+                                </button>
+                                <button 
+                                    onClick={() => handleQuickAction(`Would you take $${Math.round(activeItem.price * 0.9)}? (10% Off)`)}
+                                    className="text-xs bg-white border border-stone-300 hover:border-brand-500 text-stone-700 px-2 py-1 rounded-md transition-all shadow-sm"
+                                >
+                                    Offer -10%
+                                </button>
+                                <button 
+                                    onClick={() => handleQuickAction(`Can I buy it for $${Math.round(activeItem.price * 0.8)}? (20% Off)`)}
+                                    className="text-xs bg-white border border-stone-300 hover:border-brand-500 text-stone-700 px-2 py-1 rounded-md transition-all shadow-sm"
+                                >
+                                    Offer -20%
+                                </button>
+                            </div>
+                        )
+                    )}
+
+                    {/* Input bar */}
+                    <form onSubmit={handleSend} className="p-3 bg-white border-t border-stone-200 flex gap-2">
+                        <input 
+                            type="text" 
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            placeholder={chatMode === 'sell' ? "Type item name & target price..." : "Type custom price or message..."} 
+                            className="flex-1 px-4 py-2.5 rounded-full border border-stone-300 focus:outline-none focus:ring-1 focus:ring-brand-500 text-sm"
+                            disabled={isTyping}
+                        />
+                        <button 
+                            type="submit" 
+                            className="bg-brand-600 text-white w-10 h-10 rounded-full hover:bg-brand-500 flex items-center justify-center transition-colors shadow" 
+                            disabled={!inputValue.trim() || isTyping}
+                        >
+                            <i className="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+
+        // Main App
+        const App = () => {
+            const [listings, setListings] = useState(initialListings);
+            const [chatOpen, setChatOpen] = useState(false);
+            const [activeItem, setActiveItem] = useState(initialListings[0]);
+            const [chatMode, setChatMode] = useState('buy');
+            const [notification, setNotification] = useState(null);
+
+            const showNotification = (msg) => {
+                setNotification(msg);
+                setTimeout(() => setNotification(null), 4000);
+            };
+
+            const handleNegotiate = (item) => {
+                setActiveItem(item);
+                setChatMode('buy');
+                setChatOpen(true);
+            };
+
+            // Seamless direct-to-chat list workflow
+            const handleStartListingChat = () => {
+                setChatMode('sell');
+                setChatOpen(true);
+                showNotification("Connecting to Live Agent... Tell us what old furniture you want to list!");
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col font-sans text-stone-800">
+                    
+                    {/* Floating Toast Notification Box */}
+                    {notification && (
+                        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 flex items-center gap-2 bg-stone-900 text-white px-6 py-3.5 rounded-full shadow-2xl transition-all border border-stone-700">
+                            <i className="fa-solid fa-comment-dots text-amber-500"></i>
+                            <span className="font-semibold text-xs sm:text-sm">{notification}</span>
+                        </div>
+                    )}
+
+                    {/* Navigation Header */}
+                    <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-40 transition-shadow">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between h-20">
+                                <div className="flex items-center cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
+                                    <i className="fa-solid fa-couch text-brand-600 text-3xl mr-3"></i>
+                                    <h1 className="font-serif font-bold text-xl sm:text-2xl text-brand-900 tracking-tight">Sell Old Furniture</h1>
+                                </div>
+                                <div className="flex items-center space-x-3 sm:space-x-6">
+                                    <button 
+                                        onClick={() => window.scrollTo({top: 550, behavior: 'smooth'})} 
+                                        className="px-2 sm:px-3 py-2 font-semibold text-sm text-stone-600 hover:text-brand-600 transition-colors"
+                                    >
+                                        Browse Items
+                                    </button>
+                                    
+                                    {/* List furniture triggers chat immediately */}
+                                    <button 
+                                        onClick={handleStartListingChat} 
+                                        className="px-3 py-2 font-bold text-xs sm:text-sm text-brand-900 hover:text-brand-950 flex items-center gap-2 bg-brand-100 border border-brand-200 rounded-xl hover:bg-brand-200 transition-all"
+                                    >
+                                        <i className="fa-solid fa-tag text-brand-600"></i>
+                                        List Your Furniture
+                                    </button>
+                                    
+                                    <a 
+                                        href="tel:+1(805) 262-8248" 
+                                        className="hidden lg:flex items-center gap-2 bg-brand-600 px-5 py-2.5 rounded-full text-white font-bold hover:bg-brand-500 transition-colors shadow-sm"
+                                    >
+                                        <i className="fa-solid fa-phone"></i>
+                                        +1 (805) 262-8248
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Premium Hero Section */}
+                    <div className="relative bg-stone-900 text-white overflow-hidden py-20 sm:py-28">
+                        <div className="absolute inset-0">
+                            <img src="https://images.unsplash.com/photo-1618220179428-22790b46a0eb?auto=format&fit=crop&w=1920&q=80" alt="Exquisite Vintage Furniture" className="w-full h-full object-cover opacity-35" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-transparent"></div>
+                        </div>
+                        <div className="relative max-w-4xl mx-auto px-4 text-center">
+                            <span className="inline-block bg-brand-600/90 text-white text-[11px] font-bold tracking-widest uppercase px-3.5 py-1.5 rounded-full mb-6">Immediate Cash & Trade Offers</span>
+                            <h2 className="text-4xl sm:text-6xl font-serif font-bold mb-5 leading-tight">Turn Old Furniture into Fast Cash</h2>
+                            <p className="text-stone-300 text-sm sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+                                The easiest local platform to buy, sell, or bargain for high-grade classic and modern furniture. Chat directly with our negotiator agent to list your piece or slash prices today!
+                            </p>
+                            
+                            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                                <button 
+                                    onClick={handleStartListingChat} 
+                                    className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white font-bold py-4 px-8 rounded-xl transition-all flex items-center justify-center gap-2 transform hover:scale-105 shadow-lg text-sm sm:text-base"
+                                >
+                                    <i className="fa-solid fa-comments"></i>
+                                    List Your Furniture (Go to Chat)
+                                </button>
+                                
+                                <a 
+                                    href="tel:+1(805) 262-8248" 
+                                    className="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold py-4 px-8 rounded-xl flex items-center gap-2 justify-center transition-all text-sm sm:text-base"
+                                >
+                                    <i className="fa-solid fa-phone"></i>
+                                    Call Hotline: +1(805) 262-8248
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Grid Section for Items */}
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                        <div className="mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                                <h3 className="text-3xl font-serif font-bold text-brand-900">Featured Vintage Furniture</h3>
+                                <p className="text-stone-500 text-sm mt-1">Found something you love? Hit "Negotiate Price" to slash prices and get a deal instantly.</p>
+                            </div>
+                            <button 
+                                onClick={handleStartListingChat}
+                                className="self-start sm:self-center bg-brand-50 hover:bg-brand-100 border border-brand-200 text-brand-900 font-bold px-5 py-3 rounded-xl text-sm transition-all flex items-center gap-2"
+                            >
+                                <i className="fa-solid fa-plus text-brand-600"></i> Got items to sell? List here
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {listings.map(item => (
+                                <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-stone-200 flex flex-col hover:shadow-xl transition-shadow duration-300">
+                                    <div className="relative h-60 bg-stone-100">
+                                        <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                        <div className="absolute bottom-4 right-4 bg-brand-900 text-white font-bold px-4 py-1.5 rounded-lg text-sm shadow-md">
+                                            Asking: ${item.price}
+                                        </div>
+                                    </div>
+                                    <div className="p-6 flex-1 flex flex-col">
+                                        <h4 className="font-bold text-xl text-stone-900 mb-1.5">{item.title}</h4>
+                                        <div className="flex gap-2 mb-4 text-xs">
+                                            <span className="bg-brand-50 text-brand-900 font-bold px-2.5 py-1 rounded border border-brand-100">
+                                                Condition: {item.condition}
+                                            </span>
+                                            <span className="text-stone-500 self-center">
+                                                by {item.seller}
+                                            </span>
+                                        </div>
+                                        <p className="text-stone-600 text-sm line-clamp-3 mb-6 flex-1 leading-relaxed">{item.description}</p>
+                                        <button 
+                                            onClick={() => handleNegotiate(item)}
+                                            className="w-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm"
+                                        >
+                                            <i className="fa-regular fa-comments"></i>
+                                            Negotiate Price
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Sell Workflow Steps */}
+                    <div className="bg-stone-100 py-16 border-y border-stone-200">
+                        <div className="max-w-6xl mx-auto px-4">
+                            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-center text-brand-900 mb-12">How to Sell Your Furniture in 3 Steps</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div className="bg-white p-8 rounded-2xl border border-stone-200 text-center shadow-sm relative">
+                                    <div className="w-12 h-12 bg-brand-100 text-brand-900 rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-5 border border-brand-200">1</div>
+                                    <h4 className="font-bold text-lg text-stone-900 mb-2">Initiate Chat</h4>
+                                    <p className="text-xs sm:text-sm text-stone-500 leading-relaxed">Click any "List Your Furniture" button to launch the live assistant instantly.</p>
+                                </div>
+                                <div className="bg-white p-8 rounded-2xl border border-stone-200 text-center shadow-sm relative">
+                                    <div className="w-12 h-12 bg-brand-100 text-brand-900 rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-5 border border-brand-200">2</div>
+                                    <h4 className="font-bold text-lg text-stone-900 mb-2">Provide Details</h4>
+                                    <p className="text-xs sm:text-sm text-stone-500 leading-relaxed">Let the chat assistant know the type of furniture, condition, and desired sale price.</p>
+                                </div>
+                                <div className="bg-white p-8 rounded-2xl border border-stone-200 text-center shadow-sm relative">
+                                    <div className="w-12 h-12 bg-brand-100 text-brand-900 rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-5 border border-brand-200">3</div>
+                                    <h4 className="font-bold text-lg text-stone-900 mb-2">Confirm & Publish</h4>
+                                    <p className="text-xs sm:text-sm text-stone-500 leading-relaxed">Call <a href="tel:+1(805) 262-8248" className="font-bold text-brand-600 hover:underline">+1 (805) 262-8248</a> to finalize, share images, and see it published live!</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                `;
-                grid.innerHTML += cardHTML;
-            });
-        }
 
-        // Cart Functionality
-        function toggleCart() {
-            const overlay = document.getElementById('cart-overlay');
-            const panel = document.getElementById('cart-panel');
-            
-            if (panel.classList.contains('translate-x-full')) {
-                // Open
-                overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.remove('opacity-0'), 10); // Trigger transition
-                panel.classList.remove('translate-x-full');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
-            } else {
-                // Close
-                overlay.classList.add('opacity-0');
-                panel.classList.add('translate-x-full');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-                document.body.style.overflow = '';
-            }
-        }
-
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                cart.push(product);
-                updateCartUI();
-                showToast(`Added ${product.name} to cart`, 'success');
-            }
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCartUI();
-            showToast('Item removed from cart', 'info');
-        }
-
-        function updateCartUI() {
-            const countBadge = document.getElementById('cart-count');
-            const itemsContainer = document.getElementById('cart-items');
-            const emptyMsg = document.getElementById('empty-cart-msg');
-            const totalEl = document.getElementById('cart-total');
-
-            // Update Badge
-            if (cart.length > 0) {
-                countBadge.classList.remove('hidden');
-                countBadge.innerText = cart.length;
-            } else {
-                countBadge.classList.add('hidden');
-            }
-
-            // Update Items List
-            if (cart.length === 0) {
-                itemsContainer.innerHTML = '';
-                itemsContainer.appendChild(emptyMsg);
-                emptyMsg.style.display = 'flex';
-                totalEl.innerText = '$0.00';
-            } else {
-                emptyMsg.style.display = 'none';
-                let html = '';
-                let total = 0;
-                
-                cart.forEach((item, index) => {
-                    total += item.price;
-                    html += `
-                        <div class="flex gap-4 items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm animate-[fadeIn_0.3s_ease-out]">
-                            <img src="${item.image}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md">
-                            <div class="flex-1">
-                                <h4 class="text-sm font-semibold text-gray-800 line-clamp-1">${item.name}</h4>
-                                <p class="text-xs text-gray-500 mb-1">${item.category}</p>
-                                <p class="text-brand-900 font-bold">$${item.price.toFixed(2)}</p>
-                            </div>
-                            <button onclick="removeFromCart(${index})" class="w-8 h-8 rounded-full bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors">
-                                <i class="fa-solid fa-trash-can text-sm"></i>
-                            </button>
+                    {/* CTA Section */}
+                    <div className="bg-brand-900 text-white py-16 text-center px-4">
+                        <div className="max-w-3xl mx-auto">
+                            <h3 className="text-3xl sm:text-4xl font-serif font-bold mb-4">Have Questions or Need Help Fast?</h3>
+                            <p className="text-brand-100 mb-8 max-w-lg mx-auto text-sm sm:text-base">Speak directly to an antique specialist. No lines, no wait times - call us now for instant appraisals!</p>
+                            <a 
+                                href="tel:+1(805) 262-8248" 
+                                className="inline-flex items-center gap-3 bg-white text-brand-900 font-extrabold px-8 py-4 rounded-xl hover:bg-brand-100 transition-all shadow-lg transform hover:scale-105"
+                            >
+                                <i className="fa-solid fa-phone text-brand-600"></i>
+                                Call +1 (805) 262-8248
+                            </a>
                         </div>
-                    `;
-                });
-                
-                itemsContainer.innerHTML = html;
-                totalEl.innerText = `$${total.toFixed(2)}`;
-            }
-        }
+                    </div>
 
-        function checkout() {
-            if (cart.length === 0) {
-                showToast("Your cart is empty!", "error");
-                return;
-            }
-            toggleCart();
-            showToast("Proceeding to secure checkout...", "success");
-            // Here you would redirect to a real checkout system.
-            setTimeout(() => {
-                cart = [];
-                updateCartUI();
-            }, 1000);
-        }
+                    {/* Footer */}
+                    <footer className="bg-stone-950 text-stone-300 py-12 border-t border-stone-900 text-sm">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div>
+                                <div className="flex items-center mb-4">
+                                    <i className="fa-solid fa-couch text-brand-500 text-2xl mr-2"></i>
+                                    <h3 className="font-serif font-bold text-white text-xl">Sell Old Furniture</h3>
+                                </div>
+                                <p className="text-stone-400 text-xs sm:text-sm leading-relaxed">Your trusted regional platform to easily negotiate, sell, trade, and purchase old and high-grade vintage furniture.</p>
+                            </div>
+                            <div>
+                                <h4 className="text-white font-bold mb-4">Helpline & Office</h4>
+                                <ul className="space-y-3 text-xs sm:text-sm">
+                                    <li className="flex items-center gap-2.5">
+                                        <i className="fa-solid fa-phone text-brand-500"></i>
+                                        <a href="tel:+1(805) 262-8248" className="text-white font-bold hover:underline">+1 (805) 262-8248</a>
+                                    </li>
+                                    <li className="flex items-center gap-2.5">
+                                        <i className="fa-solid fa-envelope text-brand-500"></i>
+                                        <span>listings@selloldfurniture.com</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="text-white font-bold mb-4">Quick Links</h4>
+                                <div className="flex flex-col gap-2.5 text-xs sm:text-sm">
+                                    <button onClick={() => window.scrollTo({top: 550, behavior: 'smooth'})} className="hover:text-white underline text-left">Browse Listings</button>
+                                    <button onClick={handleStartListingChat} className="hover:text-white underline text-left">List My Old Furniture (via Chat)</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 pt-6 border-t border-stone-800 text-center text-stone-500 text-xs">
+                            <p>&copy; 2026 Sell Old Furniture. All rights reserved.</p>
+                        </div>
+                    </footer>
 
-        // Sell Form Handling
-        function handleSellSubmit(event) {
-            event.preventDefault();
-            const form = event.target;
-            
-            // Show custom success notification instead of alert
-            showToast("Success! Your item is now under review and will be listed shortly.", "success");
-            
-            // Reset form
-            form.reset();
-        }
+                    {/* Active Live Chat Widget */}
+                    <ChatWidget 
+                        isOpen={chatOpen} 
+                        setIsOpen={setChatOpen} 
+                        activeItem={activeItem} 
+                        chatMode={chatMode}
+                        setChatMode={setChatMode}
+                    />
+                </div>
+            );
+        };
 
-        // Mobile Menu Toggle
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // Custom Toast Notification System (replaces alerts)
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            
-            const toast = document.createElement('div');
-            
-            // Colors based on type
-            let bgClass = "bg-gray-800 text-white";
-            let icon = "fa-circle-info";
-            
-            if (type === 'success') {
-                bgClass = "bg-green-600 text-white";
-                icon = "fa-circle-check";
-            } else if (type === 'error') {
-                bgClass = "bg-red-600 text-white";
-                icon = "fa-circle-exclamation";
-            } else if (type === 'info') {
-                bgClass = "bg-brand-900 text-white";
-                icon = "fa-bell";
-            }
-
-            toast.className = `flex items-center gap-3 px-5 py-4 rounded-lg shadow-xl ${bgClass} transform transition-all duration-300 translate-y-10 opacity-0 pointer-events-auto`;
-            toast.innerHTML = `
-                <i class="fa-solid ${icon} text-lg"></i>
-                <p class="font-medium text-sm">${message}</p>
-            `;
-
-            container.appendChild(toast);
-
-            // Animate in
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-10', 'opacity-0');
-            });
-
-            // Animate out and remove
-            setTimeout(() => {
-                toast.classList.add('translate-y-10', 'opacity-0');
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 3000);
-        }
-
-        // Initialize App
-        window.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
-            
-            // Navbar scroll effect
-            const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 20) {
-                    navbar.classList.add('py-0');
-                    navbar.classList.remove('py-2');
-                } else {
-                    navbar.classList.add('py-2');
-                    navbar.classList.remove('py-0');
-                }
-            });
-        });
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
